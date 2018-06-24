@@ -8,6 +8,7 @@ import HandPanel from "./HandPanel"
 
 import 'bootstrap/dist/css/bootstrap.css';
 import {Col, Grid, Row} from "react-bootstrap";
+import ResultEvaluator from './ResultEvaluator';
 
 interface IAppState {
   playerHand : Card[];
@@ -48,6 +49,7 @@ IAppState > {
               onChangeCards={() => {
               this.changeSelectedCards();
               this.setState({gameState: GameState.AFTER_CHANGE});
+              this.displayResult();
             }}
               onReplay={() => {
               this.initializeDeck();
@@ -106,6 +108,9 @@ IAppState > {
     this.setState({playerHand: cardsLeft})
     const numberOfNewCards = 5 - cardsLeft.length;
     this.drawCardFromDeck(numberOfNewCards);
+  }
+  private displayResult = () => {
+    ResultEvaluator(this.state.playerHand);
   }
 }
 
