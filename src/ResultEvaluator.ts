@@ -90,24 +90,38 @@ const detectTwoPairs = (hand : Card[]) : Value => {
     return pairs.sort()[1];
 }
 
-export default(hand : Card[]) : IResult => {
-    const detectedThree = detectThree(hand);
-    if (detectedThree !== Value.UNSET) {
-        return {primaryCardValue: detectedThree, type: ResultType.THREE};
-    }
-
-    const detectedTwoPairs = detectTwoPairs(hand);
-    if (detectedTwoPairs !== Value.UNSET) {
-        return {primaryCardValue: detectedTwoPairs, type: ResultType.TWO_PAIRS};
-    }
-
-    const detectedPair = detectOnePair(hand);
-    if (detectedPair !== Value.UNSET) {
-        return {primaryCardValue: detectedPair, type: ResultType.ONE_PAIR};
-    }
-
-    hand = hand.sort((left, right) => {
+const detectHighCard = (hand : Card[]) : Value => {
+    hand = hand.slice().sort((left, right) => {
         return right.value - left.value;
     });
-    return {primaryCardValue: hand[0].value, type: ResultType.HIGH_CARD};
+    return hand[0].value;
+}
+
+export default (hand : Card[]) : IResult => {
+    const detectorsHandlers = [
+        {
+            detector: detectThree,
+            type: ResultType.THREE
+        },
+        {
+            detector: detectTwoPairs,
+            type: ResultType.TWO_PAIRS
+        },
+        {
+            detector: detectOnePair,
+            type: ResultType.ONE_PAIR
+        },
+        {
+            detector: detectHighCard,
+            type: ResultType.HIGH_CARD
+        }
+    ]
+    for (const handler of detectorsHandlers)
+    {        
+        const detectionResult = handler.detector(hand);
+        if (detectionResult !== Value.UNSET) {
+            return {primaryCardValue: detectionResult, type: handler.type};
+        }
+    };
+    throw new Error("Detectors couldn't determine result of game");
 }
