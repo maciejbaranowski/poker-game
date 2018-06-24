@@ -49,6 +49,11 @@ export const resultToString = (result : IResult) => {
     return resultTypeToString(result.type);
 }
 
+interface IDetectorHandler {
+    detector: (hand : Card[]) => Value,
+    type: ResultType
+} 
+
 const detectPairs = (hand : Card[]) : Value[] => {
     const detectedPairs : Value[] = [];
     for (let firstCardIndex = 0; firstCardIndex < hand.length; firstCardIndex += 1) {
@@ -98,7 +103,7 @@ const detectHighCard = (hand : Card[]) : Value => {
 }
 
 export default (hand : Card[]) : IResult => {
-    const detectorsHandlers = [
+    const detectorsHandlers : IDetectorHandler[] = [
         {
             detector: detectThree,
             type: ResultType.THREE
