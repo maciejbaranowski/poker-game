@@ -1,9 +1,8 @@
 {
-  "name": "cra-ts",
+  "name": "poker-game",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/react-bootstrap": "^0.32.9",
     "axios": "^0.18.0",
     "bootstrap": "^3.0.0",
     "jquery": "^3.3.1",
@@ -19,6 +18,7 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
+    "@types/react-bootstrap": "^0.32.9",
     "@types/jest": "^23.1.0",
     "@types/node": "^10.3.3",
     "@types/react": "^16.3.17",
