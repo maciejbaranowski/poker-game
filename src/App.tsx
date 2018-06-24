@@ -1,6 +1,6 @@
-import axios from "axios";
 import * as React from 'react';
 
+import APIConnector from "./APIConntector"
 import Card from "./Card"
 import ControlPanel from "./ControlPanel"
 import HandPanel from "./HandPanel"
@@ -9,20 +9,21 @@ import 'bootstrap/dist/css/bootstrap.css';
 import {Col, Grid, Row} from "react-bootstrap";
 
 interface IAppState {
-  deckId : number;
   playerHand : Card[];
   processing : boolean;
 }
 
 class App extends React.Component < any,
 IAppState > {
+  private api : APIConnector;
+
   constructor(props : any) {
     super(props);
     this.state = {
-      deckId: 0,
       playerHand: [],
       processing: true
     }
+    this.api = new APIConnector;
   }
   public componentDidMount() {
     this.initializeDeck();
@@ -52,40 +53,29 @@ IAppState > {
     );
   }
   private initializeDeck = () => {
-    axios
-      .get("https://deckofcardsapi.com/api/deck/new/shuffle/")
-      .then((response) => {
-        this.setState({
-          deckId: response.data.deck_id
-        }, () => {
-          this.setState({processing: false})
-        })
-      }, console.log);
+    this
+      .api
+      .initializeDeck();
+    this.setState({processing: false});
   }
   private drawCardFromDeck = (count : number = 1) => {
     this.setState({
       processing: true
     }, () => {
-      axios
-        .get(`https://deckofcardsapi.com/api/deck/${this.state.deckId}/draw/?count=${count}`)
-        .then((response) => {
-          if (response.data.success) {
-            for (const cardDescription of response.data.cards) {
-              const card = new Card(cardDescription.suit, cardDescription.value, cardDescription.image);
-              this.setState({
-                playerHand: [
-                  ...this.state.playerHand,
-                  card
-                ]
-              });
-            }
-          } else {
-            alert("Nie ma więcej kart w talii!");
-          }
-          this.setState({processing: false})
+      this
+        .api
+        .drawCardFromDeck(count)
+        .then(cards => {
+          this.setState({
+            playerHand: [
+              ...this.state.playerHand,
+              ...cards
+            ]
+          }, () => {
+            this.setState({processing: false});
+          });
         })
     })
-
   }
 }
 
