@@ -25,8 +25,8 @@ export enum Value {
 
 export default class Card {
     public toggled : boolean = false;
-    private suit : Suit = Suit.UNSET;
-    private value : Value = Value.UNSET;
+    public suit : Suit = Suit.UNSET;
+    public value : Value = Value.UNSET;
     private imageUrl : string = "";
     public setCardFromApi(suit : string = "", type : string = "", imageUrl : string = "") {
         this.suit = this.convertStringToSuit(suit);

@@ -8,12 +8,13 @@ import HandPanel from "./HandPanel"
 
 import 'bootstrap/dist/css/bootstrap.css';
 import {Col, Grid, Row} from "react-bootstrap";
-import ResultEvaluator from './ResultEvaluator';
+import ResultEvaluator, {resultToString} from './ResultEvaluator';
 
 interface IAppState {
   playerHand : Card[];
   processing : boolean;
   gameState : GameState;
+  status : string;
 }
 
 class App extends React.Component < any,
@@ -25,7 +26,8 @@ IAppState > {
     this.state = {
       gameState: GameState.EMPTY_HAND,
       playerHand: [],
-      processing: true
+      processing: true,
+      status: ""
     }
     this.api = new APIConnector;
   }
@@ -46,16 +48,17 @@ IAppState > {
               this.drawCardFromDeck();
               this.setState({gameState: GameState.INITIAL_CARDS});
             }}
-              onChangeCards={() => {
-              this.changeSelectedCards();
+              onChangeCards={async() => {
+              await this.changeSelectedCards();
               this.setState({gameState: GameState.AFTER_CHANGE});
               this.displayResult();
             }}
               onReplay={() => {
               this.initializeDeck();
-              this.setState({gameState: GameState.EMPTY_HAND, playerHand: []})
+              this.setState({gameState: GameState.EMPTY_HAND, playerHand: [], status: ""})
             }}
-              enabled={!this.state.processing}/></Col>
+              enabled={!this.state.processing}
+              status={this.state.status}/></Col>
           <Col sm={8}>
             <HandPanel
               cards={this.state.playerHand}
@@ -98,7 +101,7 @@ IAppState > {
         })
     })
   }
-  private changeSelectedCards = () => {
+  private changeSelectedCards = async() => {
     const cardsLeft = this
       .state
       .playerHand
@@ -107,10 +110,12 @@ IAppState > {
       });
     this.setState({playerHand: cardsLeft})
     const numberOfNewCards = 5 - cardsLeft.length;
-    this.drawCardFromDeck(numberOfNewCards);
+    await this.drawCardFromDeck(numberOfNewCards);
   }
   private displayResult = () => {
-    ResultEvaluator(this.state.playerHand);
+    this.setState({
+      status: `Twój układ to: ${resultToString(ResultEvaluator(this.state.playerHand))}.`
+    });
   }
 }
 

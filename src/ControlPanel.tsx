@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, ButtonGroup} from "react-bootstrap"
+import {Alert, Button, ButtonGroup} from "react-bootstrap"
 import {GameState} from './GameState';
 
 const getLabel = (props : IControlPanelProps) : string => {
@@ -34,11 +34,13 @@ interface IControlPanelProps {
     onChangeCards : () => void,
     onReplay : () => void,
     enabled : boolean,
-    currentGameState : GameState
+    currentGameState : GameState,
+    status: string,
 }
 const ControlPanel = (props : IControlPanelProps) => {
     return <ButtonGroup vertical={true} block={true}>
         <Button bsStyle="primary" onClick={getHandler(props)} disabled={!props.enabled}>{getLabel(props)}</Button>
+        <Alert bsStyle="warning" hidden={props.status===""}>{props.status}</Alert>
     </ButtonGroup>
 }
 
