@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/react-bootstrap": "^0.32.9",
     "axios": "^0.18.0",
-    "bootstrap": "^4.1.1",
+    "bootstrap": "^3.0.0",
     "jquery": "^3.3.1",
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",

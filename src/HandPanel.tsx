@@ -7,7 +7,7 @@ interface ICardViewProps {
 }
 const CardView = (props: ICardViewProps) => {
     const topOffset = props.card.toggled ? "20px" : "0px";
-    return <div style={{float:"left", width: "50px", top: topOffset, position: "relative"}} onClick={props.onClick}><img src={props.card.getImageUrl()}/><br/>{props.card.toString()}<br/></div>
+    return <div style={{float:"left", width: "50px", top: topOffset, position: "relative"}} onClick={props.onClick}><img src={props.card.getImageUrl()}/></div>
 }
 
 interface IHandPanelProps {

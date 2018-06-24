@@ -7,7 +7,7 @@ export default class APIConnector {
         const response = await axios.get("https://deckofcardsapi.com/api/deck/new/shuffle/")
         this.deckId = response.data.deck_id;
     }
-    public async drawCardFromDeck(count : number = 1) : Promise<Card[]> {
+    public async drawCardFromDeck(count : number = 5) : Promise<Card[]> {
         const response = await axios.get(`https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=${count}`);
         if (response.data.success) {
             return response.data.cards.map((cardDescription : any) => {
