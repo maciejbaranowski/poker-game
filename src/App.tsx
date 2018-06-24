@@ -20,7 +20,6 @@ interface IAppState {
 class App extends React.Component < any,
 IAppState > {
   private api : APIConnector;
-
   constructor(props : any) {
     super(props);
     this.state = {
@@ -44,13 +43,13 @@ IAppState > {
           <Col sm={4}>
             <ControlPanel
               currentGameState={this.state.gameState}
-              onInitialPick={() => {
-              this.drawCardFromDeck();
+              onInitialPick={async () => {
+              await this.drawCardFromDeck();
               this.setState({gameState: GameState.INITIAL_CARDS});
             }}
               onChangeCards={async() => {
               await this.changeSelectedCards();
-              this.setState({gameState: GameState.AFTER_CHANGE});
+              await this.setStateAsync({gameState: GameState.AFTER_CHANGE});
               this.displayResult();
             }}
               onReplay={() => {
@@ -72,6 +71,13 @@ IAppState > {
       </Grid>
     );
   }
+  private setStateAsync = async(state : any) => {
+    return new Promise((resolve) => {
+      this.setState(state, () => {
+        resolve();
+      })
+    })
+  }
   private initializeDeck = () => {
     this.setState({
       processing: true
@@ -82,24 +88,27 @@ IAppState > {
     });
     this.setState({processing: false});
   }
-  private drawCardFromDeck = (count : number = 5) => {
-    this.setState({
-      processing: true
-    }, () => {
-      this
-        .api
-        .drawCardFromDeck(count)
-        .then(cards => {
-          this.setState({
-            playerHand: [
-              ...this.state.playerHand,
-              ...cards
-            ]
-          }, () => {
-            this.setState({processing: false});
-          });
-        })
-    })
+  private drawCardFromDeck = async (count : number = 5) => {
+    return new Promise((resolve) => {
+      this.setState({
+        processing: true
+      }, () => {
+        this
+          .api
+          .drawCardFromDeck(count)
+          .then(cards => {
+            this.setState({
+              playerHand: [
+                ...this.state.playerHand,
+                ...cards
+              ]
+            }, () => {
+              this.setState({processing: false});
+              resolve();
+            });
+          })
+      })
+    });
   }
   private changeSelectedCards = async() => {
     const cardsLeft = this
@@ -108,7 +117,7 @@ IAppState > {
       .filter(card => {
         return !card.toggled;
       });
-    this.setState({playerHand: cardsLeft})
+    await this.setStateAsync({playerHand: cardsLeft})
     const numberOfNewCards = 5 - cardsLeft.length;
     await this.drawCardFromDeck(numberOfNewCards);
   }
