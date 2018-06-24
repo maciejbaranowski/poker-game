@@ -60,6 +60,20 @@ const detectPairs = (hand : Card[]) : Value[] => {
     }
     return detectedPairs;
 }
+
+const detectThree = (hand : Card[]) : Value => {
+    for (let firstCardIndex = 0; firstCardIndex < hand.length; firstCardIndex += 1) {
+        for (let secondCardIndex = firstCardIndex + 1; secondCardIndex < hand.length; secondCardIndex += 1) {
+            for (let thirdCardIndex = secondCardIndex + 1; thirdCardIndex < hand.length; thirdCardIndex += 1) {
+                if (hand[firstCardIndex].value === hand[secondCardIndex].value && hand[firstCardIndex].value === hand[thirdCardIndex].value) {
+                    return hand[firstCardIndex].value;
+                }
+            }
+        }
+    }
+    return Value.UNSET;
+}
+
 const detectOnePair = (hand : Card[]) : Value => {
     const pairs = detectPairs(hand);
     if (pairs.length !== 1) {
@@ -77,6 +91,11 @@ const detectTwoPairs = (hand : Card[]) : Value => {
 }
 
 export default(hand : Card[]) : IResult => {
+    const detectedThree = detectThree(hand);
+    if (detectedThree !== Value.UNSET) {
+        return {primaryCardValue: detectedThree, type: ResultType.THREE};
+    }
+
     const detectedTwoPairs = detectTwoPairs(hand);
     if (detectedTwoPairs !== Value.UNSET) {
         return {primaryCardValue: detectedTwoPairs, type: ResultType.TWO_PAIRS};
@@ -86,6 +105,7 @@ export default(hand : Card[]) : IResult => {
     if (detectedPair !== Value.UNSET) {
         return {primaryCardValue: detectedPair, type: ResultType.ONE_PAIR};
     }
+
     hand = hand.sort((left, right) => {
         return right.value - left.value;
     });
