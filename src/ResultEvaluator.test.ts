@@ -30,4 +30,14 @@ it('properly detects pair', () => {
         new Card().setCard(Suit.CLUBS, Value.n4),
         new Card().setCard(Suit.CLUBS, Value.n5)
     ])).toEqual({primaryCardValue: Value.n5, type: ResultType.ONE_PAIR});
-})
+});
+
+it('properly detects two pairs', () => {
+    expect(sut([
+        new Card().setCard(Suit.HEARTS, Value.Q),
+        new Card().setCard(Suit.CLUBS, Value.n2),
+        new Card().setCard(Suit.CLUBS, Value.n3),
+        new Card().setCard(Suit.DIAMONDS, Value.n3),
+        new Card().setCard(Suit.CLUBS, Value.Q)
+    ])).toEqual({primaryCardValue: Value.Q, type: ResultType.TWO_PAIRS});
+});
