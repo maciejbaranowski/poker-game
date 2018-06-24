@@ -11,7 +11,7 @@ export default class APIConnector {
         const response = await axios.get(`https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=${count}`);
         if (response.data.success) {
             return response.data.cards.map((cardDescription : any) => {
-                return new Card(cardDescription.suit, cardDescription.value, cardDescription.image);
+                return new Card().setCardFromApi(cardDescription.suit, cardDescription.value, cardDescription.image);
             });
         } else {
             alert("Nie ma więcej kart w talii!");

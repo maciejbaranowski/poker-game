@@ -1,11 +1,12 @@
-enum Suit {
+export enum Suit {
     HEARTS,
     CLUBS,
     SPADES,
-    DIAMONDS
+    DIAMONDS,
+    UNSET
 }
 
-enum Value {
+export enum Value {
     n2,
     n3,
     n4,
@@ -18,18 +19,25 @@ enum Value {
     J,
     Q,
     K,
-    A
+    A,
+    UNSET
 }
 
 export default class Card {
     public toggled : boolean = false;
-    private suit : Suit;
-    private value : Value;
-    private imageUrl : string;
-    constructor(suit : string, type : string, imageUrl : string) {
+    private suit : Suit = Suit.UNSET;
+    private value : Value = Value.UNSET;
+    private imageUrl : string = "";
+    public setCardFromApi(suit : string = "", type : string = "", imageUrl : string = "") {
         this.suit = this.convertStringToSuit(suit);
         this.value = this.convertStringToValue(type);
         this.imageUrl = imageUrl;
+        return this;
+    }
+    public setCard(suit: Suit, value: Value) {
+        this.suit = suit;
+        this.value = value;        
+        return this;
     }
     public toString() {
         return this
@@ -53,7 +61,7 @@ export default class Card {
                 return Suit.DIAMONDS
         }
         console.error("UNKOWN SUIT: " + suit);
-        return Suit.HEARTS;
+        return Suit.UNSET;
     }
     private convertStringToValue(value : string) : Value {
         switch(value) {
@@ -85,6 +93,6 @@ export default class Card {
                 return Value.A
         }
         console.error("UNKNOWN VALUE: ", value);
-        return Value.A;
+        return Value.UNSET;
     }
 };
