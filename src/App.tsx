@@ -8,6 +8,7 @@ import HandPanel from "./HandPanel"
 
 import 'bootstrap/dist/css/bootstrap.css';
 import {Col, Grid, Row} from "react-bootstrap";
+import compareResult from './ResultComparison';
 import ResultEvaluator, {resultToString} from './ResultEvaluator';
 
 interface IAppState {
@@ -57,6 +58,7 @@ IAppState > {
               onShowOponent={async() => {
               await this.addCardFromDeckForOponent();
               this.displayOponentResult();
+              this.displayFinalResult();
               this.setState({gameState: GameState.OPONENT_CHECKED});
             }}
               onReplay={() => {
@@ -154,15 +156,22 @@ IAppState > {
     const numberOfNewCards = 5 - cardsLeft.length;
     await this.addCardFromDeckForPlayer(numberOfNewCards);
   }
-  private displayPlayerResult = () => {
-    this.setState({
+  private displayPlayerResult = async () => {
+    await this.setStateAsync({
       status: [...this.state.status, `Twój układ to: ${resultToString(ResultEvaluator(this.state.playerHand))}.`]
     });
   }
-  private displayOponentResult = () => {
-    this.setState({
+  private displayOponentResult = async () => {
+    await this.setStateAsync({
       status: [...this.state.status, `Układ przeciwnika to: ${resultToString(ResultEvaluator(this.state.oponentHand))}.`]
     });
+  }
+  private displayFinalResult = async () => {
+    const finalResult = (compareResult(ResultEvaluator(this.state.playerHand), ResultEvaluator(this.state.oponentHand))) 
+                      ? "Wygrałeś!" : "Przeciwnik wygrał!";
+    await this.setStateAsync({
+      status: [...this.state.status, finalResult]
+    })
   }
 }
 
