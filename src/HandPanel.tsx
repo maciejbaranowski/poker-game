@@ -20,7 +20,7 @@ const HandPanel = (props : IHandPanelProps) => {
         .map((card : Card, index : number) => {
             return <CardView key={index} card={card} onClick={()=> {props.onCardClicked(index)}}/>
         });
-    return <div>{cards}</div>
+    return <div style={{display: "flex"}}>{cards}</div>
 }
 
 export default HandPanel;

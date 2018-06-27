@@ -12,9 +12,10 @@ import ResultEvaluator, {resultToString} from './ResultEvaluator';
 
 interface IAppState {
   playerHand : Card[];
+  oponentHand : Card[];
   processing : boolean;
   gameState : GameState;
-  status : string;
+  status : string[];
 }
 
 class App extends React.Component < any,
@@ -24,9 +25,10 @@ IAppState > {
     super(props);
     this.state = {
       gameState: GameState.EMPTY_HAND,
+      oponentHand: [],
       playerHand: [],
       processing: true,
-      status: ""
+      status: []
     }
     this.api = new APIConnector;
   }
@@ -43,18 +45,23 @@ IAppState > {
           <Col sm={4}>
             <ControlPanel
               currentGameState={this.state.gameState}
-              onInitialPick={async () => {
-              await this.drawCardFromDeck();
+              onInitialPick={async() => {
+              await this.addCardFromDeckForPlayer();
               this.setState({gameState: GameState.INITIAL_CARDS});
             }}
               onChangeCards={async() => {
               await this.changeSelectedCards();
               await this.setStateAsync({gameState: GameState.AFTER_CHANGE});
-              this.displayResult();
+              this.displayPlayerResult();
+            }}
+              onShowOponent={async() => {
+              await this.addCardFromDeckForOponent();
+              this.displayOponentResult();
+              this.setState({gameState: GameState.OPONENT_CHECKED});
             }}
               onReplay={() => {
               this.initializeDeck();
-              this.setState({gameState: GameState.EMPTY_HAND, playerHand: [], status: ""})
+              this.setState({gameState: GameState.EMPTY_HAND, playerHand: [], oponentHand: [], status: []})
             }}
               enabled={!this.state.processing}
               status={this.state.status}/></Col>
@@ -65,6 +72,12 @@ IAppState > {
               const hand = this.state.playerHand;
               hand[index].toggled = !hand[index].toggled;
               this.setState({playerHand: hand})
+            }}/>
+            <br/>
+            <HandPanel
+              cards={this.state.oponentHand}
+              onCardClicked={() => {
+              return;
             }}/>
           </Col>
         </Row>
@@ -88,8 +101,36 @@ IAppState > {
     });
     this.setState({processing: false});
   }
-  private drawCardFromDeck = async (count : number = 5) => {
+  private addCardFromDeckForPlayer = async(count : number = 5) => {
+    const cards = await this.drawCardFromDeck(count);
     return new Promise((resolve) => {
+      this.setState({
+        playerHand: [
+          ...this.state.playerHand,
+          ...cards
+        ]
+      }, () => {
+        this.setState({processing: false});
+        resolve();
+      })
+    });
+  }
+  private addCardFromDeckForOponent = async(count : number = 5) => {
+    const cards = await this.drawCardFromDeck(count);
+    return new Promise((resolve) => {
+      this.setState({
+        oponentHand: [
+          ...this.state.oponentHand,
+          ...cards
+        ]
+      }, () => {
+        this.setState({processing: false});
+        resolve();
+      })
+    });
+  }
+  private drawCardFromDeck = async(count : number = 5) : Promise < Card[] > => {
+    return new Promise < Card[] > ((resolve) => {
       this.setState({
         processing: true
       }, () => {
@@ -97,15 +138,7 @@ IAppState > {
           .api
           .drawCardFromDeck(count)
           .then(cards => {
-            this.setState({
-              playerHand: [
-                ...this.state.playerHand,
-                ...cards
-              ]
-            }, () => {
-              this.setState({processing: false});
-              resolve();
-            });
+            resolve(cards);
           })
       })
     });
@@ -119,11 +152,16 @@ IAppState > {
       });
     await this.setStateAsync({playerHand: cardsLeft})
     const numberOfNewCards = 5 - cardsLeft.length;
-    await this.drawCardFromDeck(numberOfNewCards);
+    await this.addCardFromDeckForPlayer(numberOfNewCards);
   }
-  private displayResult = () => {
+  private displayPlayerResult = () => {
     this.setState({
-      status: `Twój układ to: ${resultToString(ResultEvaluator(this.state.playerHand))}.`
+      status: [...this.state.status, `Twój układ to: ${resultToString(ResultEvaluator(this.state.playerHand))}.`]
+    });
+  }
+  private displayOponentResult = () => {
+    this.setState({
+      status: [...this.state.status, `Układ przeciwnika to: ${resultToString(ResultEvaluator(this.state.oponentHand))}.`]
     });
   }
 }
