@@ -18,7 +18,7 @@ export interface IResult {
     primaryCardValue : Value
 }
 
-const resultTypeToString = (resultType : ResultType) => {
+const resultTypeToString = (resultType : ResultType) : string => {
     switch (resultType) {
         case ResultType.HIGH_CARD:
             return "Nic!";
@@ -44,8 +44,7 @@ const resultTypeToString = (resultType : ResultType) => {
     throw Error("UNKNOWN RESULTTYPE");
 }
 
-export const resultToString = (result : IResult) => {
-    // TODO: implement displaying high card
+export const resultToString = (result : IResult) : string => {
     return resultTypeToString(result.type);
 }
 
@@ -64,6 +63,16 @@ const detectPairs = (hand : Card[]) : Value[] => {
         }
     }
     return detectedPairs;
+}
+
+// TODO: Implement other detectors
+
+const detectFlush = (hand : Card[]) : Value => {
+    const firstCardSuit = hand[0].suit;
+    if (!hand.every(card => card.suit === firstCardSuit)) {
+        return Value.UNSET;
+    }
+    return hand.slice().sort((l, r) => r.value - l.value)[0].value;
 }
 
 const detectThree = (hand : Card[]) : Value => {
@@ -104,6 +113,10 @@ const detectHighCard = (hand : Card[]) : Value => {
 
 export default (hand : Card[]) : IResult => {
     const detectorsHandlers : IDetectorHandler[] = [
+        {
+            detector: detectFlush,
+            type: ResultType.FLUSH
+        },
         {
             detector: detectThree,
             type: ResultType.THREE

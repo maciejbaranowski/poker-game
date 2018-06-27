@@ -51,3 +51,13 @@ it('properly detects three', () => {
         new Card().setCard(Suit.CLUBS, Value.Q)
     ])).toEqual({primaryCardValue: Value.Q, type: ResultType.THREE});
 });
+
+it('properly detects flush', () => {
+    expect(sut([
+        new Card().setCard(Suit.HEARTS, Value.Q),
+        new Card().setCard(Suit.HEARTS, Value.n2),
+        new Card().setCard(Suit.HEARTS, Value.n10),
+        new Card().setCard(Suit.HEARTS, Value.K),
+        new Card().setCard(Suit.HEARTS, Value.n3)
+    ])).toEqual({primaryCardValue: Value.K, type: ResultType.FLUSH});
+});
